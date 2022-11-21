@@ -2,6 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { Sale } from "../../models/sale";
+import { BASE_URL } from "../../utils/request";
 import NotificationButton from '../NotificationButton';
 import './styles.css';
 
@@ -16,12 +18,14 @@ function SalesCard() {
     const [minDate, setMinDate] = useState(new Date());
     const [maxDate, setMaxDate] = useState(new Date());
 
+    const [sales, setSales] = useState<Sale[]>([]);
+
     useEffect(() => {
-        axios.get("http://localhost:8080/sales")
-        .then(response => {
-            console.log(response.data);
-        });
-    }, [])
+        axios.get(`${BASE_URL}/sales`)
+            .then(response => {
+                setSales(response.data.content);
+            });
+    }, []);
 
     return (
         <div className="ds-meta-card">
@@ -60,45 +64,25 @@ function SalesCard() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>#000</td>
-                            <td>00/00/00</td>
-                            <td>Vendedor001</td>
-                            <td>N° visitas</td>
-                            <td>N° vendas</td>
-                            <td>R$ valor</td>
-                            <td>
-                                <div className="dsmeta-red-button-container">
-                                    <NotificationButton />
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#000</td>
-                            <td>00/00/00</td>
-                            <td>Vendedor002</td>
-                            <td>N° visitas</td>
-                            <td>N° vendas</td>
-                            <td>R$ valor</td>
-                            <td>
-                                <div className="dsmeta-red-button-container">
-                                    <NotificationButton />
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#000</td>
-                            <td>00/00/00</td>
-                            <td>Vendedor003</td>
-                            <td>N° visitas</td>
-                            <td>N° vendas</td>
-                            <td>R$ valor</td>
-                            <td>
-                                <div className="dsmeta-red-button-container">
-                                    <NotificationButton />
-                                </div>
-                            </td>
-                        </tr>
+                        {sales.map(sale => {
+                            return (
+                                <tr key={sale.id}>
+                                    <td>{sale.id}</td>
+                                    <td>{new Date(sale.date).toLocaleDateString()}</td>
+                                    <td>{sale.sellerName}</td>
+                                    <td>{sale.visited}</td>
+                                    <td>{sale.deals}</td>
+                                    <td>{sale.amount.toFixed(2)}</td>
+                                    <td>
+                                        <div className="dsmeta-red-button-container">
+                                            <NotificationButton />
+                                        </div>
+                                    </td>
+                                </tr>
+                            )
+                        })
+                        }
+
                     </tbody >
                 </table >
             </div >
